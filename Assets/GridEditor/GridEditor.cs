@@ -17,13 +17,5 @@ namespace GridEditor {
                 grid.CreateMarchingSquares();
             }
         }
-
-        private void OnValidate() {
-            var grid = target as MarchingSquares;
-
-            if (!grid) return;
-
-            grid.CreateMarchingSquares();
-        }
     }
 }

@@ -8,15 +8,20 @@ using UnityEngine;
 public class MarchingSquares : MonoBehaviour {
     [SerializeField] private MeshFilter _meshFilter;
     
-    [SerializeField] private int _width = 16;
-    [SerializeField] private int _height = 16;
-    [SerializeField] private float _resolution = 1.0f;
-
-    [SerializeField] private CellVertex[,] _inputMatrix;
-    [SerializeField] private ContourCell[,] _cells;
-    [SerializeField] private float _isoValue = 0.5f;
-    [SerializeField] private float _perlinNoiseScale = 1.0f;
-    [SerializeField] private bool _useInterpolation;
+    [SerializeField] [OnChangeCall("CreateMarchingSquares")] [Min(2)] 
+    private int _width = 16;
+    [SerializeField] [OnChangeCall("CreateMarchingSquares")] [Min(2)] 
+    private int _height = 16;
+    [SerializeField] [OnChangeCall("CreateMarchingSquares")] [Min(0)] 
+    private float _resolution = 1.0f;
+    [SerializeField] [OnChangeCall("CreateMarchingSquares")] [Min(0)] 
+    private float _isoValue = 0.5f;
+    [SerializeField] [OnChangeCall("CreateMarchingSquares")] [Min(0)] 
+    private float _perlinNoiseScale = 1.0f;
+    [SerializeField] [OnChangeCall("CreateMarchingSquares")]
+    private float _perlinSeed = 1.0f;
+    [SerializeField] [OnChangeCall("CreateMarchingSquares")] 
+    private bool _useInterpolation;
     
     [Header("Debug")] [SerializeField] private bool _drawSquares;
     
@@ -24,6 +29,9 @@ public class MarchingSquares : MonoBehaviour {
     private int _gridColumns;
     private float _gridStepX;
     private float _gridStepY;
+    
+    private CellVertex[,] _inputMatrix;
+    private ContourCell[,] _cells;
     
     // Mesh stuff
     private List<int> _meshTriangles;
@@ -42,6 +50,9 @@ public class MarchingSquares : MonoBehaviour {
     }
 
     public void CreateMarchingSquares() {
+        if (_resolution <= 0)
+            return;
+
         _gridRows = (int)(_height / _resolution);
         _gridColumns = (int)(_width / _resolution);
         _gridStepX = _width / (float)_gridColumns;
@@ -77,8 +88,8 @@ public class MarchingSquares : MonoBehaviour {
         for (var row = 0; row < _gridRows; row++) {
             for (var col = 0; col < _gridColumns; col++) {
                 _inputMatrix[row, col].Weight = Mathf.PerlinNoise(
-                    col * _perlinNoiseScale,
-                    row * _perlinNoiseScale
+                    col * _perlinNoiseScale + _perlinSeed,
+                    row * _perlinNoiseScale + _perlinSeed
                 );
             }
         }
